@@ -77,11 +77,7 @@ A **fully explainable Digital Twin system** for Smart Water Management that comb
 - Learns and calibrates over time
 - Fully explainable (no black boxes)
 
-❌ **What we DON'T do:**
-- No CFD/EPANET complexity
-- No AI-replaces-physics claims
-- No perfect data requirements
-- No pure ML approach
+
 
 ---
 
