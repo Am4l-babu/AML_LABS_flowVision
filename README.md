@@ -2,6 +2,8 @@
 
 > **A Physics-Informed Machine Learning Digital Twin for Real-Time Water Network Management**
 
+**TL;DR:** The system predicts normal demand, detects abnormal loss using physics-informed logic, and visually pinpoints likely leak locations in a live Digital Twin.
+
 ---
 
 ## 👥 Team Identity
@@ -347,6 +349,8 @@ Underground Pipe Network
 
 ### Implementation Architecture
 
+> **Note:** All neuromorphic and SNN hardware references represent a conceptual deployment target; the current demo simulates this behavior in software.
+
 **Hardware Level:**
 ```
 ┌─────────────────────┐
@@ -459,6 +463,70 @@ Reasoning:           Flow is 30% higher than expected AND pressure dropped
 
 ---
 
+## 🔍 Leak Detection and Pinpointing Logic
+
+### How the System Distinguishes Leaks from Normal Water Usage
+
+The system does **not** classify leaks based on raw sensor values alone. Instead, it follows a **Digital Twin–based reasoning process** that separates expected user consumption from abnormal water loss.
+
+First, a supervised machine learning model is trained on historical sensor data to learn normal consumption patterns. This model predicts the expected flow for a given time, based on temporal features such as hour and day. This represents how much water **should** be flowing if usage is normal.
+
+At runtime, the Digital Twin continuously compares:
+- **Expected flow** (predicted demand)
+- **Observed flow** (sensor measurement)
+- **Observed pressure**
+
+A condition is classified as **normal usage** when increased flow is accompanied by stable pressure and matches the expected demand pattern. In contrast, a **leak is detected** when the observed flow is significantly higher than the expected flow while pressure simultaneously drops, indicating water loss that cannot be explained by legitimate consumption.
+
+This dual-condition check prevents false positives caused by high user demand.
+
+### Leak Detection Logic (Decision Criteria)
+
+A leak is flagged only when **all** of the following conditions are met:
+
+1. **Observed flow exceeds expected flow** by a defined margin
+2. **Pressure drops** below the expected operating range
+3. **The deviation persists** across consecutive time steps
+
+If these conditions are not met, the behavior is treated as normal usage, even if flow is high.
+
+**This ensures that user demand spikes are not misclassified as leaks.**
+
+### How the Digital Twin Pinpoints the Leak Location
+
+Once a leak is detected, the Digital Twin localizes it using **network topology and physical behavior**, not machine learning alone.
+
+The water network is modeled as connected pipe segments. The Digital Twin evaluates pressure and flow deviations along the flow direction:
+
+- **Pipes upstream of a leak** show increased flow with minor pressure change
+- **Pipes downstream of a leak** show significant pressure loss
+- **The leak location is inferred** at the transition point where expected behavior first breaks
+
+By comparing upstream and downstream deviations, the system identifies the most probable pipe segment where the leak exists and highlights it in the network visualization.
+
+**Localization is limited to pipe-segment or block level, not exact physical leak coordinates.**
+
+### Confidence Estimation
+
+Each detected leak is assigned a **confidence score** based on:
+
+- **Magnitude of deviation** from expected behavior
+- **Consistency over time**
+- **Agreement between pressure and flow signals**
+
+This prevents single noisy readings from triggering false alarms and allows operators to prioritize inspections.
+
+### Why This Approach is Reliable
+
+✅ **Machine learning is used only for demand estimation**, not leak classification  
+✅ **Physical constraints ensure explainability** and robustness  
+✅ **The Digital Twin reasons over system behavior** rather than raw data  
+✅ **The approach works even with limited sensors** and imperfect pipeline data  
+
+This combination enables accurate detection and localization of hidden leaks while avoiding confusion with normal water consumption.
+
+---
+
 ## ⚗️ Physics-Informed Logic
 
 **IMPORTANT:** This is NOT physics simulation (CFD/EPANET). These are **logical physical constraints** for explainable reasoning.
@@ -481,6 +549,7 @@ if (observed_flow > expected_flow + tolerance):
 ```python
 pressure_drop = f × (L/D) × (ρ × v²/2)
 # Simplified for real-time calculation
+# Used only as a qualitative constraint, not a numerical solver
 ```
 
 **Plain English:** When water flows faster through a pipe, pressure naturally drops due to friction. If pressure drops MORE than expected, something unusual is happening.
@@ -825,7 +894,86 @@ pip install --upgrade streamlit pandas numpy scikit-learn plotly networkx matplo
 
 ---
 
-## 📚 Additional Resources
+## � Future Scope and Upgrades
+
+The current implementation focuses on explainable, data-driven leak detection and localization suitable for a hackathon demo and early deployment. The architecture is intentionally modular, allowing several meaningful upgrades without redesigning the core system.
+
+### 1. Advanced Demand Prediction Models
+
+The present system uses an explainable supervised learning model for demand estimation. Future versions can integrate:
+
+- **Seasonal time-series models (SARIMA)**
+- **Recurrent neural networks (LSTM/GRU)** for long-term consumption trends
+
+These models would improve prediction accuracy in areas with strong seasonal or event-driven demand variations while retaining the Digital Twin's expected-vs-observed reasoning framework.
+
+### 2. Edge-Level Spiking Neural Network Deployment
+
+In this demo, SNN behavior is simulated in software. A future upgrade would deploy the SNN on edge hardware near sensors to:
+
+- Detect leak onset in real time
+- Reduce data transmission
+- Enable ultra-low-power continuous monitoring
+
+This would allow the Digital Twin to react faster while keeping centralized reasoning unchanged.
+
+### 3. Acoustic and Vibration Sensor Integration
+
+Leak localization accuracy can be improved by integrating:
+
+- **Acoustic sensors**
+- **Vibration or hydrophone data**
+
+These signals can be processed by the SNN layer to strengthen event detection and reduce false positives, especially for small or early-stage leaks.
+
+### 4. Pipe Health and Degradation Modeling
+
+The Digital Twin can be extended to maintain a **pipe health index** by tracking long-term deviations in pressure loss and flow efficiency. This would allow:
+
+- Early identification of corrosion or aging pipes
+- Predictive maintenance scheduling
+- Asset prioritization for replacement
+
+### 5. Graph-Aware Learning for Network-Scale Insights
+
+Future versions may explore graph-based learning methods to capture complex interactions across the network. These models would not replace physics-based reasoning but assist in identifying large-scale patterns across zones and districts.
+
+### 6. Automated Repair Validation
+
+After a leak repair or valve operation, the Digital Twin can automatically:
+
+- Verify whether pressure and flow return to expected behavior
+- Confirm repair effectiveness
+- Update confidence levels
+
+This closes the loop between detection, intervention, and validation.
+
+### 7. Integration with Utility Operations
+
+The system can be extended to integrate with:
+
+- **SCADA systems**
+- **GIS platforms**
+- **Maintenance ticketing systems**
+
+This would allow seamless transition from detection to field action.
+
+### 8. City-Scale Digital Twin Expansion
+
+With additional sensors and zoning, the same framework can scale from a ward-level demo to:
+
+- District-level networks
+- Entire city water systems
+
+without changing the underlying Digital Twin logic.
+
+### Why These Upgrades Matter
+
+Each proposed enhancement builds on the existing **Digital Twin foundation**—physics-informed reasoning, explainable ML, and interactive visualization—ensuring the system remains **transparent, reliable, and deployable** in real-world water infrastructure.
+
+---
+
+## �📚 Additional Resources
 
 - **Demo Guide:** See `demo_guide.md` for presentation tips
 - **Code Comments:** All Python files have detailed explanations
