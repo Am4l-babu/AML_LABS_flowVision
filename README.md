@@ -45,6 +45,12 @@ A **fully explainable Digital Twin system** for Smart Water Management that comb
 - **Training:** Only normal operation data (no leaks)
 - **Extensibility:** Ready for LSTM/SARIMA for temporal patterns
 
+**Spiking Neural Network (SNN):**
+- **Role:** Event-detection layer at sensor level
+- **Function:** Converts sudden signal changes into discrete spike events
+- **Benefit:** Low-power, real-time anomaly detection on edge devices
+- **Integration:** Triggers Digital Twin reasoning when anomalies detected
+
 **Physics Engine:**
 - Simplified Darcy-Weisbach (pressure-flow relationship)
 - Conservation of Mass (flow balance)
@@ -164,6 +170,10 @@ The app will open in your browser at `http://localhost:8501`
 
 ## 🏗️ Architecture
 
+### System Layers
+
+The system integrates **four intelligent layers** that work together:
+
 ```
 ┌─────────────────────────────────────────────────┐
 │          USER INTERFACE (Streamlit)             │
@@ -173,24 +183,241 @@ The app will open in your browser at `http://localhost:8501`
 └─────────────────┬───────────────────────────────┘
                   │
 ┌─────────────────▼───────────────────────────────┐
-│         DIGITAL TWIN (Orchestration)            │
-│  - Coordinates ML + Detection                   │
+│         DIGITAL TWIN (Reasoning Layer)          │
+│  - Coordinates all layers                       │
+│  - Physics-informed validation                  │
 │  - Provides explainability                      │
-└────────┬────────────────────────┬────────────────┘
-         │                        │
-┌────────▼────────┐      ┌────────▼────────────────┐
-│  ML MODEL       │      │  LEAK DETECTION         │
-│  (Demand)       │      │  ALGORITHM              │
-│                 │      │                         │
-│  Predicts       │      │  Compares:              │
-│  EXPECTED flow  │      │  - Expected flow        │
-│                 │      │  - Observed flow        │
-│                 │      │  - Pressure drop        │
-│                 │      │                         │
-│  Output:        │      │  Output:                │
-│  Flow rate      │      │  LEAK / NORMAL          │
-└─────────────────┘      └─────────────────────────┘
+└────────┬────────────┬────────────┬──────────────┘
+         │            │            │
+    ┌────▼────┐  ┌────▼─────┐  ┌──▼──────────┐
+    │   SNN   │  │    ML    │  │   PHYSICS   │
+    │ (Event) │  │ (Memory) │  │   (Laws)    │
+    └─────────┘  └──────────┘  └─────────────┘
+         │            │            │
+    Reflexes      Patterns      Constraints
 ```
+
+### Component Breakdown
+
+```
+┌─────────────────────────────────────────────────┐
+│  🎯 LAYER 1: SNN Event Detection (Reflexes)    │
+│  - Processes time-series sensor signals         │
+│  - Detects sudden pressure drops/flow surges    │
+│  - Event-driven, low-power edge processing      │
+│  - Triggers alert when anomaly detected         │
+└─────────────────┬───────────────────────────────┘
+                  │ Spike Event
+┌─────────────────▼───────────────────────────────┐
+│  🤖 LAYER 2: ML Demand Prediction (Memory)     │
+│  - Linear Regression model                      │
+│  - Learns normal consumption patterns           │
+│  - Predicts EXPECTED flow rate                  │
+└─────────────────┬───────────────────────────────┘
+                  │ Expected Flow
+┌─────────────────▼───────────────────────────────┐
+│  ⚗️ LAYER 3: Physics Rules (Laws)              │
+│  - Conservation of mass                         │
+│  - Pressure-flow relationship                   │
+│  - Validates against physical constraints       │
+└─────────────────┬───────────────────────────────┘
+                  │ Physics Validation
+┌─────────────────▼───────────────────────────────┐
+│  🧠 LAYER 4: Digital Twin (Reasoning)          │
+│  - Fuses SNN alerts + ML predictions + Physics  │
+│  - Localizes leak location                      │
+│  - Provides explainable decisions               │
+│  - Outputs: Status, Confidence, Reasoning       │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+## 🧬 Spiking Neural Network (SNN) Integration
+
+### What is an SNN?
+
+A **Spiking Neural Network (SNN)** mimics biological neural behavior by processing information as discrete **spike events** rather than continuous values. Unlike traditional neural networks, SNNs are inherently:
+- **Event-driven**: Only activate when changes occur
+- **Low-power**: Minimal energy consumption (ideal for IoT)
+- **Time-aware**: Naturally encode temporal patterns
+
+### Role in the Digital Twin
+
+**SNN = Fast Reflexes (Layer 1)**
+
+The SNN acts as the **first responder** at the sensor level:
+
+```python
+# Conceptual SNN behavior
+if abs(pressure_change) > threshold:
+    emit_spike()  # Alert the Digital Twin
+```
+
+**Key Point:** The SNN does **NOT** replace the Digital Twin or physics reasoning. It's a **trigger mechanism** that alerts the system when something unusual happens.
+
+### Why Use SNN?
+
+| Traditional Approach | SNN Approach |
+|---------------------|-------------|
+| Continuous polling of all sensors | Event-driven (only activates on change) |
+| High power consumption | Ultra-low power (perfect for battery sensors) |
+| May miss rapid transients | Captures sudden spikes naturally |
+| No temporal encoding | Encodes timing of events |
+
+### Advantages
+
+1. **⚡ Fast Detection**: Identifies sudden anomalies in microseconds
+2. **🔋 Energy Efficient**: Runs on edge devices without draining batteries
+3. **📡 Real-Time**: No latency from cloud processing
+4. **🎯 Event-Focused**: Filters out noise, only alerts on significant changes
+5. **🌐 Scalable**: Can deploy thousands of sensors without infrastructure overload
+6. **🧠 Bio-Inspired**: Mimics human nervous system's fast reflex response
+
+### Where SNN is Used
+
+**Deployment Location:** Edge sensors in the water network
+
+```
+Underground Pipe Network
+         ↓
+   [Pressure Sensor] ← SNN chip
+         ↓ (spike event)
+   Wireless Gateway
+         ↓
+   Digital Twin Server
+```
+
+**Specific Use Cases:**
+- **Burst pipe detection**: Sudden pressure drop triggers immediate spike
+- **Valve malfunction**: Unexpected flow surge generates alert
+- **Leak onset**: Gradual pressure decline accumulates spikes
+- **Water hammer**: Rapid oscillations create spike patterns
+
+### How SNN Integrates with Digital Twin
+
+**Step-by-Step Process:**
+
+1. **Sensor Reads Data**
+   - Pressure: 95 PSI → 70 PSI (sudden drop)
+   - Flow: 50 L/min → 75 L/min (surge)
+
+2. **SNN Processes Signal**
+   ```
+   ΔPressure = -25 PSI (exceeds threshold)
+   → SNN fires spike event
+   ```
+
+3. **Spike Triggers Digital Twin**
+   - DT wakes up and analyzes the flagged segment
+   - ML predicts expected flow (should be 50 L/min)
+   - Physics checks if pressure drop is consistent with leak
+
+4. **Multi-Signal Fusion**
+   - SNN: ✅ Anomaly detected (reflex)
+   - ML: ✅ Flow higher than expected (memory)
+   - Physics: ✅ Pressure drop confirms leak (law)
+   - **Decision: LEAK (High Confidence)**
+
+5. **Explainable Output**
+   ```
+   Status: LEAK
+   Location: Zone_4_Block_2_Pipe_3
+   Confidence: 85%
+   Reasoning:
+     - SNN detected sudden pressure drop (-25 PSI)
+     - ML predicted 50 L/min, observed 75 L/min (+50%)
+     - Physics confirms: excess flow + pressure loss = leak
+   ```
+
+### SNN vs. Traditional ML
+
+| Aspect | Traditional ML | SNN |
+|--------|---------------|-----|
+| **Operation** | Continuous inference | Event-driven |
+| **Power** | High (always on) | Ultra-low (spikes only) |
+| **Speed** | Batch processing | Instant (reflex) |
+| **Use Case** | Pattern learning | Anomaly detection |
+| **Deployment** | Cloud/server | Edge device |
+| **Explainability** | Model-dependent | Event-based (clear trigger) |
+
+**Hybrid Approach (This System):**
+- SNN detects **when** something is wrong (fast, low-power)
+- ML predicts **what** should be normal (learned patterns)
+- Physics validates **why** it's a leak (fundamental laws)
+- Digital Twin reasons **how** to respond (integrated intelligence)
+
+### Implementation Architecture
+
+**Hardware Level:**
+```
+┌─────────────────────┐
+│  Water Pipe Sensor  │
+│  - Pressure sensor  │
+│  - Flow sensor      │
+│  - MCU + SNN chip   │ ← Neuromorphic hardware (e.g., Intel Loihi)
+└──────────┬──────────┘
+           │ LoRa/NB-IoT (low power)
+           ▼
+   ┌───────────────┐
+   │   Gateway     │
+   └───────┬───────┘
+           │
+           ▼
+   ┌───────────────────┐
+   │  Digital Twin     │
+   │  (Cloud/Server)   │
+   └───────────────────┘
+```
+
+**Software Level:**
+```python
+# Pseudocode for SNN layer
+class SNNEventDetector:
+    def process_sensor_data(self, pressure, flow):
+        # Encode changes as spikes
+        pressure_spike = self.encode_spike(pressure, threshold=10)
+        flow_spike = self.encode_spike(flow, threshold=5)
+        
+        if pressure_spike or flow_spike:
+            return {
+                'event_detected': True,
+                'spike_type': 'pressure_drop' if pressure_spike else 'flow_surge',
+                'timestamp': time.now(),
+                'trigger_dt': True  # Alert Digital Twin
+            }
+        return {'event_detected': False}
+```
+
+### Benefits to the Digital Twin System
+
+1. **Reduced False Alarms**: SNN filters noise, DT only processes genuine anomalies
+2. **Faster Response**: Edge detection (ms) + DT reasoning (seconds) = rapid leak isolation
+3. **Lower Bandwidth**: Only transmit spike events, not continuous sensor streams
+4. **Scalability**: Deploy in remote areas without constant connectivity
+5. **Explainability**: Clear chain: SNN spike → ML deviation → Physics confirmation → Leak
+
+### Conceptual Framework
+
+**Biological Analogy:**
+
+Think of the water network as a living organism:
+
+- **SNN = Nerve Endings (Reflexes)**  
+  Instantly react to pain (pressure drop)
+
+- **ML = Hippocampus (Memory)**  
+  Remember normal patterns ("this pipe usually flows at 50 L/min")
+
+- **Physics = Laws of Nature (Constraints)**  
+  Water can't disappear (conservation of mass)
+
+- **Digital Twin = Cerebral Cortex (Reasoning)**  
+  Integrates all signals and makes informed decisions
+
+**Together:** Fast reflexes + learned memory + physical laws + intelligent reasoning = Robust leak detection
+
+---
 
 ## 🧩 Project Structure
 
