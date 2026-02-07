@@ -81,7 +81,7 @@ A **fully explainable Digital Twin system** for Smart Water Management that comb
 
 ## 🧠 Understanding the Digital Twin
 
-### What is a Digital Twin? (For Judges)
+### What is a Digital Twin?
 
 A Digital Twin is **NOT** a single AI model. It's a **system of interconnected models** that:
 
@@ -112,8 +112,6 @@ Decision & Visualization (multi-signal fusion)
 Each layer is explainable and traceable.
 
 ---
-
-## 🎯 What This Demo Does
 
 ## 🎯 What This Demo Does
 
@@ -162,12 +160,7 @@ The app will open in your browser at `http://localhost:8501`
 3. **Observe the network** - Pipes turn RED when leaks are detected
 4. **Check the statistics** - See overall accuracy and detection metrics
 
-## 📊 Dataset
 
-- **File**: `data/location_aware_gis_leakage_dataset.csv`
-- **Records**: 5000 sensor readings
-- **Features**: Pressure, Flow, Temperature, Vibration, RPM, Location
-- **Labels**: Leak flags (0=Normal, 1=Leak)
 
 ## 🏗️ Architecture
 
@@ -465,13 +458,7 @@ Visualization & Operator Decisions
 
 ---
 
-## 🎓 Final Judge-Grade Explanation
 
-**Memorize this statement:**
-
-> "The Digital Twin integrates physics-based hydraulic modeling with data-driven demand learning. Supervised and semi-supervised learning are used only where appropriate—demand prediction and anomaly classification—while physical laws govern pressure and flow behavior. The system continuously validates predictions against real observations, calibrates pipe parameters to infer degradation, and improves accuracy over time without requiring full system redesign."
-
-**That statement answers everything judges might ask.**
 
 ---
 
@@ -491,7 +478,7 @@ Visualization & Operator Decisions
 
 ---
 
-## 🚀 Quick Start
+## 📊 Performance
 
 Based on the test dataset:
 - **Accuracy**: ~83%
@@ -522,17 +509,7 @@ The model is intentionally **conservative** (better to check a false alarm than 
 - Accuracy, Precision, Recall
 - Confusion matrix details
 
-## 🎯 For Judges
 
-This demo is designed to be **self-explanatory**:
-
-✅ **Visual**: Leaks appear as red pipes - immediate understanding  
-✅ **Transparent**: All reasoning steps visible in the panel  
-✅ **Interactive**: Slider lets you explore the data  
-✅ **Real ML**: Not fake AI - actual Linear Regression model  
-✅ **Practical**: Uses real-world sensor data patterns  
-
-**No code reading required to understand the concept!**
 
 ## 🔧 Technical Details
 
