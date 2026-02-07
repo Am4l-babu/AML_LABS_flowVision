@@ -351,7 +351,7 @@ Underground Pipe Network
 │  Water Pipe Sensor  │
 │  - Pressure sensor  │
 │  - Flow sensor      │
-│  - MCU + SNN chip   │ ← Neuromorphic hardware (e.g., Intel Loihi)
+│  - MCU + SNN chip   │ ← Neuromorphic-capable edge hardware (conceptual)
 └──────────┬──────────┘
            │ LoRa/NB-IoT (low power)
            ▼
@@ -385,6 +385,8 @@ class SNNEventDetector:
         return {'event_detected': False}
 ```
 
+> **Note:** In this demo, SNN behavior is simulated in software to demonstrate system integration. The architecture is designed for deployment on neuromorphic hardware in production environments.
+
 ### Benefits to the Digital Twin System
 
 1. **Reduced False Alarms**: SNN filters noise, DT only processes genuine anomalies
@@ -412,6 +414,8 @@ Think of the water network as a living organism:
   Integrates all signals and makes informed decisions
 
 **Together:** Fast reflexes + learned memory + physical laws + intelligent reasoning = Robust leak detection
+
+> **Critical Clarification:** The SNN does not localize leaks; it only signals abnormal events. Localization and explanation are performed exclusively by the Digital Twin reasoning layer.
 
 ---
 
@@ -526,7 +530,10 @@ Pipe_A leak flags: [0, 0, 0, 0, 0] (no leaks)
 
 ❌ **NOT retraining the ML model** (model stays the same)  
 ❌ **NOT changing detection thresholds** (thresholds stay the same)  
-✅ **IS adjusting pipe-specific baselines** based on learned behavior  
+❌ **NOT modifying the physical network topology**  
+✅ **IS adjusting pipe-specific baselines** based on learned behavior
+
+**Key Point:** Calibration adjusts pipe-specific baselines, not the physical network topology or the underlying ML model.  
 
 ### Why This Matters
 
@@ -708,7 +715,7 @@ Based on the test dataset:
 - **Recall**: 100% (catches all real leaks)
 - **Precision**: ~26% (some false positives, which is safer for critical infrastructure)
 
-The model is intentionally **conservative** (better to check a false alarm than miss a real leak).
+**Why low precision?** This is an intentional design choice to prioritize recall in safety-critical infrastructure. The model is **conservative** (better to check a false alarm than miss a real leak).
 
 ## 🎨 UI Features
 
@@ -731,6 +738,8 @@ The model is intentionally **conservative** (better to check a false alarm than 
 - Leaks detected
 - Accuracy, Precision, Recall
 - Confusion matrix details
+
+**Design Philosophy:** Color, thickness, and motion are used as primary communication tools so operators can understand system state without reading numbers.
 
 
 
@@ -755,13 +764,22 @@ The model is intentionally **conservative** (better to check a false alarm than 
 - **Edges**: Pipes connecting them
 - **Colors**: Dynamic based on detection status
 
-## 🚨 Constraints (By Design)
+## 🚨 What This Demo Is (and Is NOT)
 
-- ❌ No physics simulation (CFD/EPANET)
-- ❌ No fake AI
-- ✅ Data-driven approach
-- ✅ Explainable decisions
-- ✅ Visual cause-and-effect
+### This Demo Does NOT:
+
+- ❌ Replace hydraulic simulators used for pipeline design
+- ❌ Claim exact pressure values at unmeasured points underground
+- ❌ Eliminate the need for field verification by maintenance teams
+- ❌ Provide centimeter-level leak localization
+
+### This Demo DOES:
+
+- ✅ Provide early detection of anomalies before catastrophic failure
+- ✅ Narrow inspection zones to specific pipe segments
+- ✅ Reduce response time from days to hours
+- ✅ Explain reasoning in human-understandable terms
+- ✅ Learn and improve accuracy over time through calibration
 
 ## 🛠️ Troubleshooting
 
