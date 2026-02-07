@@ -52,7 +52,7 @@ A **fully explainable Digital Twin system** for Smart Water Management that comb
 - **Integration:** Triggers Digital Twin reasoning when anomalies detected
 
 **Physics Engine:**
-- Simplified Darcy-Weisbach (pressure-flow relationship)
+- Simplified Darcy-Weisbach–inspired pressure-flow relationship
 - Conservation of Mass (flow balance)
 - Localized effect modeling (leak isolation)
 
@@ -242,6 +242,8 @@ A **Spiking Neural Network (SNN)** mimics biological neural behavior by processi
 
 **SNN = Fast Reflexes (Layer 1)**
 
+> **Important:** In this demo, SNN behavior is simulated in software to demonstrate system integration; hardware deployment is conceptual.
+
 The SNN acts as the **first responder** at the sensor level:
 
 ```python
@@ -250,7 +252,7 @@ if abs(pressure_change) > threshold:
     emit_spike()  # Alert the Digital Twin
 ```
 
-**Key Point:** The SNN does **NOT** replace the Digital Twin or physics reasoning. It's a **trigger mechanism** that alerts the system when something unusual happens.
+**Key Point:** The SNN does **NOT** replace the Digital Twin or physics reasoning. It's a **trigger mechanism** that alerts the system when something unusual happens. The SNN does not estimate pressure, flow, or location; it only signals abnormal events.
 
 ### Why Use SNN?
 
@@ -473,7 +475,7 @@ if (observed_flow > expected_flow + tolerance):
 
 **Plain English:** If more water flows through than we expect people to use, it's going somewhere else (leak).
 
-#### 2. Pressure-Flow Relationship (Simplified Darcy-Weisbach)
+#### 2. Pressure-Flow Relationship (Simplified Darcy-Weisbach–Inspired)
 **Principle:** Higher flow → More friction → Pressure drop
 
 ```python
@@ -715,9 +717,11 @@ Based on the test dataset:
 - **Recall**: 100% (catches all real leaks)
 - **Precision**: ~26% (some false positives, which is safer for critical infrastructure)
 
-**Why low precision?** This is an intentional design choice to prioritize recall in safety-critical infrastructure. The model is **conservative** (better to check a false alarm than miss a real leak).
+**Why low precision?** This is an intentional design choice to prioritize recall in safety-critical infrastructure. This trade-off is intentional: missing a leak is more costly than investigating a false alarm. The model is **conservative** (better to check a false alarm than miss a real leak).
 
 ## 🎨 UI Features
+
+**Design Philosophy:** Color, thickness, and motion are used as primary communication tools so operators can understand system state without reading numbers.
 
 ### Digital Twin Reasoning Panel
 - 🤖 Expected Flow (ML prediction)
@@ -738,8 +742,6 @@ Based on the test dataset:
 - Leaks detected
 - Accuracy, Precision, Recall
 - Confusion matrix details
-
-**Design Philosophy:** Color, thickness, and motion are used as primary communication tools so operators can understand system state without reading numbers.
 
 
 
@@ -765,6 +767,8 @@ Based on the test dataset:
 - **Colors**: Dynamic based on detection status
 
 ## 🚨 What This Demo Is (and Is NOT)
+
+**Core Principle:** This project demonstrates **decision support**, not automated control.
 
 ### This Demo Does NOT:
 
