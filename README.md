@@ -813,5 +813,11 @@ pip install --upgrade streamlit pandas numpy scikit-learn plotly networkx matplo
 
 ## 📝 License
 
-Open source - use as you like!
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+**Key Points:**
+- ✅ Free to use, modify, and distribute
+- ✅ Commercial use allowed
+- ✅ Attribution required
+- ✅ No warranty provided
 
