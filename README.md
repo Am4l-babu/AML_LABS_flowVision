@@ -611,35 +611,7 @@ pip install --upgrade streamlit pandas numpy scikit-learn plotly networkx matplo
 
 ---
 
-## 🤝 Contributing
-
-This is a **hackathon demo** - feel free to:
-- Adjust detection thresholds in `leak_algorithm.py`
-- Try different ML models in `demand_model.py`
-- Enhance visualizations in `visualization.py`
-- Add more physics rules in `physics_rules.py`
-
----
-
-## 🎯 Hackathon Evaluation Criteria
-
-**This project demonstrates:**
-
-✅ **Digital Twin Architecture** - Not just AI, but ML + Physics + Reasoning  
-✅ **Physics-Informed Logic** - Explicit physical constraints (conservation, pressure-flow)  
-✅ **Machine Learning** - Supervised learning for demand prediction  
-✅ **Real-Time Algorithm** - Row-by-row leak detection  
-✅ **Interactive Visualization** - Network graph with clickable pipes  
-✅ **Learning System** - Calibration that improves over time  
-✅ **Full Explainability** - Every decision can be traced and explained  
-✅ **Real Data** - Uses actual sensor dataset  
-
----
-
 ## 📝 License
 
 Open source - use as you like!
 
----
-
-**Built for hackathon judges to understand Digital Twin + ML without reading code. 🎉**
