@@ -1,8 +1,8 @@
-# 🎉 FlowVision - Smart Water Digital Twin
+# 🎉 AML LABS - Smart Water Digital Twin
 
 ## Team Submission Summary
 
-**Team Name:** FlowVision  
+**Team Name:** AML LABS  
 **Team Leader:** Amal Babu (+91 7034177362)  
 **Members:** Govind Lal T L, Abel Jeevan, Navaneeth Santosh
 
@@ -197,4 +197,4 @@ After watching the demo, judges should be able to answer:
 
 ---
 
-**FlowVision - Making Water Networks Intelligent 💧**
+**AML LABS - Making Water Networks Intelligent 💧**
